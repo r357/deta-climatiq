@@ -19,7 +19,7 @@ db = deta.Base("history")
 @app.get('/', response_class=HTMLResponse)
 def land():
     land = '''
-    <p>This experiment will compute the co2e for a given route length and transport weight for different modes of transportation.</p>
+    <p>This experiment will compute CO2 equivalents for a given route length and transport weight for different modes of transportation.</p>
     <p>Visit <a href=route?km=1000&weight=10>https://climatiq.alenrozac.com/route?km=1000&weight=10</a></p>
     <p>Change parameters (kilometers, weight in tonnes) directly in the url.</p>
     <p><br><br></p>
@@ -90,15 +90,14 @@ async def route(km: int, weight: int):
     
     # Describe results
     h0 = "Input parameters: " + str(km) + " km, " + str(weight) + " tonnes."
-    h1 = "Least carbon-intensive mode: " + str(options[besti]) + " at " + str(round(best)) + " C02-equivalent."
-    h2 = [str(option+" is "+str(round(compare))+"x as bad.") for option, compare in comparison]
+    h1 = "Least carbon-intensive mode: <br>" + str(options[besti]) + " at " + str(round(best,2)) + " C02 equivalent."
+    h2 = [str(option+" is "+str(round(compare,2))+"x as bad.") for option, compare in comparison]
     h20, h21, h22 = h2
 
     # Prepare output html
     out = '''
     <p>%s</p>
     <p>%s</p>
-    <p><br></p>
     <p>%s</p>
     <p>%s</p>
     <p>%s</p>
