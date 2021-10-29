@@ -98,9 +98,9 @@ async def route(km: int, weight: int):
     out = '''
     <p>%s</p>
     <p>%s</p>
-    <p>%s</p>
-    <p>%s</p>
-    <p>%s</p>
+    %s<br>
+    %s<br>
+    %s</p>
     ''' % (h0, h1, h20, h21, h22)
     return out
 
