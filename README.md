@@ -1,3 +1,4 @@
+[![Deploy](https://button.deta.dev/1/svg)](https://go.deta.dev/deploy?repo=https://github.com/r357/deta-climatiq)
 # deta-climatiq
 Test Deta implementation of Climatiq API for experimatal pvrposes.
 
