@@ -3,9 +3,10 @@ from creds import API_KEY # API_KEY = "bearer <KEY>"
 
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
-import requests
-from deta import Deta
 from datetime import datetime
+from deta import Deta
+import numpy as np
+import requests
 
 
 app = FastAPI()
@@ -18,7 +19,7 @@ db = deta.Base("history")
 @app.get('/', response_class=HTMLResponse)
 def land():
     land = '''
-        <p>This experiment will compute the co2e for a given route length and transport weight for different modes of transportation.</p>
+    <p>This experiment will compute the co2e for a given route length and transport weight for different modes of transportation.</p>
     <p>Visit <a href=route?km=1000&weight=10>https://climatiq.alenrozac.com/route?km=1000&weight=10</a></p>
     <p>Change parameters (kilometers, weight in tonnes) directly in the url.</p>
     <p><br><br></p>
@@ -31,7 +32,7 @@ def land():
 
 
 
-@app.get('/route')
+@app.get('/route', response_class=HTMLResponse)
 async def route(km: int, weight: int):
     url = "https://beta.api.climatiq.io/estimate"    
     headers = {
@@ -74,18 +75,39 @@ async def route(km: int, weight: int):
         else:
             response.append(resp.json())
 
-        # Compare results
-        co2e = [resp["co2e"] for resp in response]
-        results = list(zip(options, modes, co2e))
+    # Prepare and store results + meta
+    co2e = [resp["co2e"] for resp in response]
+    results = list(zip(options, modes, co2e))
+    store = (str(datetime.now()), km, weight, results) 
+    db.put(list(store)) # f it, just store for now...
+
+    # Compare results
+    best = min(co2e)
+    besti=np.argmin(co2e)
+    compare = [(e/best)-1 for e in co2e]
+    comparison = list(zip(options, compare))    
+    comparison.remove(comparison[besti])
+    
+    # Describe results
+    h0 = "Input parameters: " + str(km) + " km, " + str(weight) + " tonnes."
+    h1 = "Least carbon-intensive mode: " + str(options[besti]) + " at " + str(round(best)) + " C02-equivalent."
+    h2 = [str(option+" is "+str(round(compare))+"x as bad.") for option, compare in comparison]
+    h20, h21, h22 = h2
+
+    # Prepare output html
+    out = '''
+    <p>%s</p>
+    <p>%s</p>
+    <p><br></p>
+    <p>%s</p>
+    <p>%s</p>
+    <p>%s</p>
+    ''' % (h0, h1, h20, h21, h22)
+    return out
 
 
 
-    return results
 
-
-
-    # print("Response time:", round((time.time()-t)*1000,0), "ms")
-    # print("CO2 Equivalent:", resp.json()["co2e"])
 
 
 
