@@ -84,7 +84,7 @@ async def route(km: int, weight: int):
     # Compare results
     best = min(co2e)
     besti=np.argmin(co2e)
-    compare = [(e/best)-1 for e in co2e]
+    compare = [(e/best) for e in co2e]
     comparison = list(zip(options, compare))    
     comparison.remove(comparison[besti])
     
