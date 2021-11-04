@@ -30,8 +30,6 @@ def land():
 
 
 
-
-
 @app.get('/route', response_class=HTMLResponse)
 async def route(km: int, weight: int):
     url = "https://beta.api.climatiq.io/estimate"    
@@ -108,6 +106,10 @@ async def route(km: int, weight: int):
 
 
 
+# # history page:
+# @app.get('/history', response_class=HTMLResponse)
+# def history():
+#     history = db.get()
 
 
 
